@@ -1,5 +1,8 @@
 package ca.bc.gov.nrids.polaris
 
+import java.io.BufferedReader
+import java.io.InputStreamReader
+
 class JenkinsUtil implements Serializable {
 
   private final static def envLongToShort = [
@@ -73,5 +76,43 @@ class JenkinsUtil implements Serializable {
       println "Error Occurs: ${e.message}"
       throw e
     }
+  }
+
+  String runShellCommand(String command) {
+    try {
+        ProcessBuilder processBuilder = new ProcessBuilder(command.split("\\s+"))
+        Process process = processBuilder.start()
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(process.inputStream))
+        StringBuilder output = new StringBuilder()
+
+        String line
+        while ((line = reader.readLine()) != null) {
+            output.append(line).append('\n')
+        }
+
+        int exitCode = process.waitFor()
+        if (exitCode == 0) {
+            return output.toString().trim()
+        } else {
+            println("Error running command: $command")
+            return null
+        }
+    } catch (Exception ex) {
+        println("Exception running command: $command - ${ex.message}")
+        return null
+    }
+  }
+
+  String runSha256Command(String filename) {
+    try {
+      String command = "sha256sum $filename"
+      String sha256sumOutput = runShellCommand(command)
+      return sha256sumOutput
+    } catch (Exception ex) {
+        println("Exception running command: $filename - ${ex.message}")
+        return null
+    }
+
   }
 }
