@@ -55,6 +55,8 @@ class BrokerIntention implements Serializable {
    * userName:                    string Sets username
    * url:                         string Sets event url
    * provider:                    string Sets event provider
+   * serviceName                  string Sets service name
+   * serviceProject               string Sets service project
    * environment:                 string Sets all action environments to this value
    * packageInstallationVersion:  string Sets all "package-installation" actions package.version to this value
    */
