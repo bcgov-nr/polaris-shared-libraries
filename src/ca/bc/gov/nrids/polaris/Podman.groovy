@@ -136,7 +136,9 @@ class Podman implements Serializable {
     }
     def envOpts = this.env && !args.skipPipelineEnv ? toEnvOptions(this.env) : ''
     def shellCmd = (args.httpProxy ? "HTTP_PROXY=${args.httpProxy} " : "") +
-      "podman run --rm --authfile=${args.authfile ?: authfile} ${args.options ?: ''} ${envOpts} ${renderImageId(args, imageId)} ${args.command ?: ''}"
+      "podman run --rm " +
+      (args.authfile ?  "--authfile=${args.authfile} " : "") +
+      "${args.options ?: ''} ${envOpts} ${renderImageId(args, imageId)} ${args.command ?: ''}"
     if (args.returnStdout)
       return steps.sh(script: shellCmd, returnStdout: true)
     else {
@@ -161,7 +163,7 @@ class Podman implements Serializable {
    * Private: Renders image prefix
    */
   def renderImageId(Map args, String imageId) {
-    def prefix = args.imagePrefix ?: imagePrefix
+    def prefix = !args.containsKey('imagePrefix') || args.imagePrefix == null ? imagePrefix : args.imagePrefix
     return (prefix ? prefix + '/' : '') + imageId
   }
 }
